@@ -1,0 +1,47 @@
+---
+title: "01-21-2025 Tidy Tuesday"
+author: "Zoe Carver"
+format: html
+---
+
+```{r include=FALSE}
+exped_tidy <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-01-21/exped_tidy.csv')
+peaks_tidy <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-01-21/peaks_tidy.csv')
+library(tidyverse)
+combined = left_join(exped_tidy, peaks_tidy)
+```
+
+```{r}
+peaks_tidy %>% 
+  ggplot(aes(x = HEIGHTM)) +
+  geom_density(aes(color = REGION_FACTOR)) +
+  labs(title = "Density of Height of Peaks by Region",
+       x = "Height of Peak in Meters",
+       y = "Density",
+       color = "Region") +
+  theme_classic()
+
+  ggsave(filename = "1-21-2025_TidyTuesday.png", plot = last_plot())
+```
+```{r}
+combined %>% 
+  group_by(PEAKID, HEIGHTM) %>% 
+  summarise(nEXP = n()) %>% 
+  arrange(desc(nEXP))
+
+popular = combined %>% 
+  filter(PEAKID == c("EVER", "AMAD", "MANA", "LHOT", "HIML", "DHA1", "MAKA", "BARU", "ANN1", "KANG"))
+```
+
+```{r}
+combined %>% 
+  ggplot(aes(x = SEASON_FACTOR, fill = SUCCESS1)) +
+  geom_bar(position = "fill")
+```
+
+```{r}
+popular %>% 
+  ggplot(aes(x = PEAKID, fill = SEASON_FACTOR)) +
+  geom_bar()
+```
+
