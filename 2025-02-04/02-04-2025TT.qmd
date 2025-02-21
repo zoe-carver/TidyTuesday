@@ -1,0 +1,45 @@
+---
+title: "Tidy Tuesday 2025-02-04"
+author: "Zoe Carver"
+format: html
+editor: visual
+---
+
+```{r message=FALSE}
+library(tidyverse)
+
+simpsons_characters <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-02-04/simpsons_characters.csv')
+simpsons_episodes <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-02-04/simpsons_episodes.csv')
+simpsons_locations <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-02-04/simpsons_locations.csv')
+simpsons_script_lines <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-02-04/simpsons_script_lines.csv')
+```
+
+```{r}
+simpson_family <- simpsons_characters %>%
+  filter(id %in% c(1, 2, 8, 9)) %>% 
+  mutate(char_id = id)
+
+spoken_lines <- simpsons_script_lines %>% 
+  filter(speaking_line == TRUE) %>% 
+  filter(!is.na(normalized_text))
+
+simpsons_speaking <- left_join(simpson_family, spoken_lines, by = c("char_id" = "character_id"))
+
+simpsons_speaking <- left_join(simpsons_speaking, simpsons_episodes, by = c("episode_id" = "id"))
+```
+
+```{r}
+simpsons_speaking %>% 
+  group_by(name, season) %>% 
+  summarise(lines_spoken = n()) %>% 
+  ggplot(aes(x = season, y = lines_spoken, color = name)) +
+  geom_line(linewidth = 2) +
+  scale_color_viridis_d() +
+  labs(title = "Lines Spoken per Season by Simpson Family Member", color = "Character") +
+  xlab("Season") +
+  ylab("Lines Spoken") +
+  theme_classic()
+
+ggsave(filename = "2-04-2025_TidyTuesday.png", plot = last_plot())
+```
+
