@@ -153,7 +153,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </figure>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ggsave(filename = "2-04-2025_TidyTuesday.png", plot = last_plot())</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="at">filename =</span> <span class="st">"2-04-2025_TidyTuesday.png"</span>, <span class="at">plot =</span> <span class="fu">last_plot</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Saving 7 x 5 in image</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 1 row containing missing values or values outside the scale range
+(`geom_line()`).</code></pre>
+</div>
 </div>
 <p>This plot shows that, by far, Homer Simpson has the most spoken lines in the Simpson family throughout the entire show. While Marge and Homer spoke more during season 24, Bart and Lisa spoke a bit less. Maggie does not have any “spoken” lines. Bart and Lisa follow very similar trends as each other, while Marge somewhat follows Homer’s path (on a lesser scale), besides season 22 and 23.</p>
 
