@@ -1,0 +1,82 @@
+---
+title: "04-01-2025 Tidy Tuesday"
+author: "Zoe Carver"
+format: 
+  html:
+    self-contained: true
+---
+
+# Set up
+
+```{r}
+library(tidyverse)
+pokemon_df <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-04-01/pokemon_df.csv')
+
+pokemon_df <- pokemon_df %>% 
+  mutate(type_1 = str_to_title(type_1), type_2 = str_to_title(type_2))
+```
+
+```{r fig.width=8}
+# Primary type graph
+pokemon_df %>% 
+  ggplot(aes(x = fct_infreq(type_1), fill = type_1)) +
+  geom_bar() +
+  labs(title = "Number of Pokemon by Primary Type") +
+  ylab("Number of Pokemon") +
+  xlab("Primary Type") +
+  scale_fill_manual(labels = c("Bug", "Dark", "Dragon", "Electric", "Fairy", "Fighting", "Fire", "Flying", "Ghost", "Grass", "Ground", "Ice", "Normal", "Poison", "Psychic", "Rock", "Steel", "Water"), values = c("#A6B91A", "#705746", "#6F35FC", "#F7D02C", "#D685AD", "#C22E28", "#EE8130", "#A98FF3", "#735797", "#7AC74C", "#E2BF65", "#96D9D6", "#A8A77A", "#A33EA1", "#F95587", "#B6A136", "#B7B7CE", "#6390F0")) +
+  theme_classic() +
+  theme(legend.position = "none", axis.text.x = element_text(angle = 20))
+
+ggsave(filename = "04-01-2025_TidyTuesday1.png", plot = last_plot())
+
+# Primary type stats
+pokemon_df %>% 
+  group_by(type_1) %>% 
+  summarise(sum = n()) %>% 
+  arrange(desc(sum))
+
+# Attack vs type boxplot
+pokemon_df %>% 
+  ggplot(aes(x = type_1, y = attack)) +
+  geom_boxplot()
+
+# Generational avg stats
+pokemon_df %>% 
+  group_by(generation_id) %>% 
+  mutate(generation_id = as.factor(generation_id), 
+         id = as.character(id), 
+         species_id = as.character(species_id)) %>% 
+  summarise(across(where(is.numeric), mean))
+
+# Attack vs defense
+pokemon_df %>% 
+  ggplot(aes(x = attack, y = defense)) +
+  geom_point()
+
+
+# Primary types with secondary types
+pokemon_df %>% 
+  filter(!is.na(type_2)) %>% 
+  ggplot(aes(x = fct_infreq(type_1), fill = type_2))+ 
+  geom_bar() +
+  labs(title = "Number of Pokemon with Primary and Secondary Types", fill = "Secondary Type") +
+  ylab("Number of Pokemon") +
+  xlab("Primary Type") +
+  scale_fill_manual(labels = c("Bug", "Dark", "Dragon", "Electric", "Fairy", "Fighting", "Fire", "Flying", "Ghost", "Grass", "Ground", "Ice", "Normal", "Poison", "Psychic", "Rock", "Steel", "Water"), values = c("#A6B91A", "#705746", "#6F35FC", "#F7D02C", "#D685AD", "#C22E28", "#EE8130", "#A98FF3", "#735797", "#7AC74C", "#E2BF65", "#96D9D6", "#A8A77A", "#A33EA1", "#F95587", "#B6A136", "#B7B7CE", "#6390F0")) +
+  guides(fill=guide_legend(ncol=2)) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 20))
+
+ggsave(filename = "04-01-2025_TidyTuesday1.png", plot = last_plot())
+
+# Secondary type stats
+pokemon_df %>% 
+  group_by(type_2) %>% 
+  summarise(sum = n()) %>% 
+  arrange(desc(sum))
+```
+
+# Observations
+
+Water and normal types are the most common types, with ghost and dragon being the least common. Of the types that have secondary types too, flying is the most common secondary type and dark is the least common. A little more than half the pokemon have secondary types.
