@@ -68,7 +68,7 @@ pokemon_df %>%
   theme_classic() +
   theme(axis.text.x = element_text(angle = 20))
 
-ggsave(filename = "04-01-2025_TidyTuesday1.png", plot = last_plot())
+ggsave(filename = "04-01-2025_TidyTuesday2.png", plot = last_plot())
 
 # Secondary type stats
 pokemon_df %>% 
