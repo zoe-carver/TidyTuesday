@@ -1,0 +1,59 @@
+---
+title: "04-08-2025 Tidy Tuesday"
+author: "Zoe Carver"
+format: 
+  html:
+    self-contained: true
+---
+
+# Set up
+
+```{r message=FALSE}
+library(tidyverse)
+care_state <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-04-08/care_state.csv')
+```
+# Question
+
+What measures have the longest wait time? What states? How do average times in ER look?
+
+What states have the larfest median time spent in ER? How does that relate to influenza vaccines in healthcare workers?
+
+HOw do physical vs mental ER visits compare?
+
+# Data wrangling
+
+```{r}
+care_state %>% 
+  pull(measure_name) %>% unique()
+
+care_wider <- care_state %>% 
+  filter(measure_name %in% c("Average (median) time patients spent in the emergency department before leaving from the visit A lower number of minutes is better", "Average (median) time patients spent in the emergency department before leaving from the visit- Psychiatric/Mental Health Patients.  A lower number of minutes is better")) %>% 
+  mutate(measure_name = str_replace(measure_name, fixed("Average (median) time patients spent in the emergency department before leaving from the visit A lower number of minutes is better"), "med_ER_time")) %>% 
+  mutate(measure_name = str_replace(measure_name, fixed("Average (median) time patients spent in the emergency department before leaving from the visit- Psychiatric/Mental Health Patients.  A lower number of minutes is better"), "med_ER_time_psych")) %>% 
+  pivot_wider(names_from = measure_name, values_from = score)
+
+care_wider %>% 
+  group_by(state) %>% 
+  summarise(med_ER_time_psych = max(med_ER_time_psych, na.rm = TRUE), med_ER_time = max(med_ER_time, na.rm = TRUE)) %>% 
+  summarise(state = state, difference = med_ER_time - med_ER_time_psych) %>% 
+  arrange(desc(difference))
+```
+
+# Visualization 
+
+```{r fig.width=7, fig.height=7}
+care_wider %>% 
+  group_by(state) %>% 
+  summarise(med_ER_time_psych = max(med_ER_time_psych, na.rm = TRUE), med_ER_time = max(med_ER_time, na.rm = TRUE)) %>% 
+  ggplot(aes(x = med_ER_time_psych, y = med_ER_time)) +
+  geom_point() +
+  geom_smooth(se = FALSE) +
+  labs(title = "Comparing Median ER times for Physical versus Psychiatric Admissions", x = "Median Time Spent in the Emergency Department (Psychiatric)", y = "Median Time Spent in the Emergency Department (Physical)") +
+  theme_classic()
+
+ggsave(filename = "04-08-2025_TidyTuesday.png", plot = last_plot())
+```
+
+# Observations
+
+Psychiatric patients tend to spend much more time in the emergency department than physical patients. Their relationship is also highly correlated. This could be due to traumatic injuries requiring faster care, but psychiatric patients could be just as emergent. The longer time could also be due to the amount of physicians on staff/required to clear a patient before discharge. South Dakota has the closest difference in times, and Delaware the furthest. 
